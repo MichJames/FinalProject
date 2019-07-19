@@ -1,0 +1,112 @@
+<!doctype html>
+<html>
+  <head>
+      <% include partials/head %>
+  </head>
+<body class="container">
+  <div class="row justify-content-center">
+    <div class="col ">
+      <h2>Hello</h2>
+      <hr/>
+    <form action="/metrics" method="post">
+      <div class="form-group">
+        <label for="form_value">Value</label>
+        <input id="form_value" type="number" name="value" />
+      </div>
+      <button class="btn btn-primary  mb-3" type="submit" value="Submit">
+        Add Value
+      </button>
+
+    </form>
+
+    <button class="btn btn-success mb-3" id="show-metrics">
+      Show my metrics
+    </button>
+    <div id="metrics"></div>
+
+<div class="row">
+<button class="btn btn-danger mt-3 mx-2" href="/logout" onClick='document.location.href="/login"'>
+  Logout
+</button>
+
+<button class="btn btn-info mx-2" id="remove-metrics">
+  Delete metric
+</button>
+</div>
+</div>
+</div>
+
+<script>
+  $('#show-metrics').click((e) => {
+  e.preventDefault();
+  $.getJSON("/metrics", {}, (data) => {
+    console.log("jusdjdjjd")
+    console.log(data.result)
+    var arValue = []
+    var arTime = []
+    data.result[0].matric.forEach(function(element) {
+      arValue.push(element.value)
+      var dat = new Date(element.timestamp*1000);
+      arTime.push(dat)
+    });
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: arTime,
+            datasets: [{
+                label: 'Metrics v.s Timestamp',
+                data: arValue,
+                backgroundColor: [
+                    'rgba(34, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(175, 192, 192, 0.2)',
+                    'rgba(13, 102, 255, 0.2)',
+                    'rgba(250, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(25, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(205, 206, 86, 1)',
+                    'rgba(71, 192, 192, 1)',
+                    'rgba(130, 102, 255, 1)',
+                    'rgba(225, 159, 64, 1)'
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+
+    $('#metrics').append(content.join("\n"));
+  });
+})
+
+$('#remove-metrics').click((e) => {
+  e.preventDefault();
+  var val = document.getElementById("form_value");
+  $.ajax({
+    url: '/metrics',
+    type: 'DELETE',
+    data: {value: val},
+    success: 'hola',
+    error: 'bad' || $.noop
+});
+})
+
+</script>
+<canvas id="myChart" width="20" height="20"></canvas>
+
+
+
+</body>
+</html>
